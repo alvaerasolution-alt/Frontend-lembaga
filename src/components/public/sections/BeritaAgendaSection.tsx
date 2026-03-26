@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Clock, MapPin } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, MapPin, Eye } from 'lucide-react';
 import type { Event, News } from '@/types';
 
 interface BeritaAgendaSectionProps {
@@ -8,9 +8,17 @@ interface BeritaAgendaSectionProps {
     locale: string;
 }
 
-const BERITA_LABELS: Record<
+const LABELS: Record<
     string,
-    { no_image: string; timezone: string; news: string; events: string; view_all_news: string; view_all_events: string }
+    {
+        no_image: string;
+        timezone: string;
+        news: string;
+        events: string;
+        view_all_news: string;
+        view_all_events: string;
+        views: string;
+    }
 > = {
     id: {
         no_image: 'Tidak ada gambar',
@@ -19,6 +27,7 @@ const BERITA_LABELS: Record<
         events: 'Agenda',
         view_all_news: 'Lihat Semua Berita',
         view_all_events: 'Lihat Semua Agenda',
+        views: 'dilihat',
     },
     en: {
         no_image: 'No Image',
@@ -27,14 +36,16 @@ const BERITA_LABELS: Record<
         events: 'Events',
         view_all_news: 'View All News',
         view_all_events: 'View All Events',
+        views: 'views',
     },
     ar: {
         no_image: 'لا توجد صورة',
         timezone: '',
         news: 'الأخبار',
         events: 'الأحداث',
-        view_all_news: 'عرض الكل',
+        view_all_news: 'عرض جميع الأخبار',
         view_all_events: 'عرض جميع الأحداث',
+        views: 'مشاهدة',
     },
 };
 
@@ -48,7 +59,6 @@ function getTitle(
 ): string {
     if (locale === 'ar' && item.title_ar) return item.title_ar;
     if (locale === 'en' && item.title_en) return item.title_en;
-
     return item.title_id;
 }
 
@@ -63,7 +73,6 @@ function getBody(item: News, locale: string): string {
         (locale === 'ar' && item.body_ar) ||
         (locale === 'en' && item.body_en) ||
         item.body_id;
-
     return body ? stripHtml(body) : '';
 }
 
@@ -116,7 +125,6 @@ function getMonthBadge(dateString: string, locale: string) {
             { month: 'short' },
         )
         .toUpperCase();
-
     return { day, month, colorClass: MONTH_COLORS[monthIdx] };
 }
 
@@ -132,7 +140,6 @@ function getCategoryName(item: News, locale: string): string {
     if (locale === 'ar' && categoryWithAr.name_ar)
         return categoryWithAr.name_ar;
     if (locale === 'en' && item.category.name_en) return item.category.name_en;
-
     return item.category.name_id;
 }
 
@@ -143,27 +150,30 @@ export default function BeritaAgendaSection({
 }: BeritaAgendaSectionProps) {
     const displayNews = news.slice(0, 6);
     const displayEvents = events.slice(0, 7);
-    const t = BERITA_LABELS[locale] || BERITA_LABELS.id;
+    const t = LABELS[locale] || LABELS.id;
+    const isRtl = locale === 'ar';
 
     return (
-        <section
-            className="py-12 md:py-16"
-            dir={locale === 'ar' ? 'rtl' : 'ltr'}
-        >
+        <section className="py-12 md:py-16" dir={isRtl ? 'rtl' : 'ltr'}>
             <div className="mx-auto max-w-7xl px-4">
                 <div className="grid gap-10 lg:grid-cols-5">
+                    {/* Left: Berita */}
                     <div className="lg:col-span-3">
-                        <h2 className="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-white">
-                            {t.news}
-                        </h2>
+                        <div className="mb-6 text-center">
+                            <h2 className="text-2xl font-bold text-gray-900 md:text-3xl dark:text-white">
+                                {t.news}
+                            </h2>
+                            <div className="mx-auto mt-2 h-1 w-16 rounded bg-[var(--brand-primary)]" />
+                        </div>
 
                         <div className="grid gap-5 sm:grid-cols-2">
                             {displayNews.map((item) => (
                                 <Link
                                     key={item.id}
-                                    to={`/${locale}/berita/${item.slug}`}
+                                    to={`/${locale}/${item.slug}`}
                                     className="group overflow-hidden rounded-xl bg-white shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-900/30"
                                 >
+                                    {/* Thumbnail */}
                                     <div className="relative aspect-[16/10] overflow-hidden">
                                         {item.image_url || item.image_path ? (
                                             <img
@@ -183,15 +193,28 @@ export default function BeritaAgendaSection({
                                                 </span>
                                             </div>
                                         )}
-                                        <span className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm">
+                                        {/* Date overlay */}
+                                        <span
+                                            className={`absolute bottom-2 rounded bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm ${isRtl ? 'right-2' : 'left-2'}`}
+                                        >
                                             {formatDate(
                                                 item.published_at,
                                                 locale,
                                             )}
-                                            {t.timezone ? ` ${t.timezone}` : ''}
+                                            {t.timezone && ` ${t.timezone}`}
                                         </span>
+                                        {/* Views overlay */}
+                                        {item.views > 0 && (
+                                            <span
+                                                className={`absolute bottom-2 flex items-center gap-1 rounded bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm ${isRtl ? 'left-2' : 'right-2'}`}
+                                            >
+                                                <Eye className="h-3 w-3" />
+                                                {item.views}
+                                            </span>
+                                        )}
                                     </div>
 
+                                    {/* Content */}
                                     <div className="p-3">
                                         <h3 className="mb-1 line-clamp-2 text-sm leading-snug font-bold text-gray-900 group-hover:text-[var(--brand-primary)] dark:text-gray-100 dark:group-hover:text-[var(--brand-primary)]">
                                             {getTitle(item, locale)}
@@ -207,21 +230,28 @@ export default function BeritaAgendaSection({
                             ))}
                         </div>
 
+                        {/* View All */}
                         <div className="mt-5 text-center">
                             <Link
                                 to={`/${locale}/berita`}
-                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-primary)] dark:text-[var(--brand-primary)] dark:hover:text-[var(--brand-primary)]"
+                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-secondary)]"
                             >
                                 {t.view_all_news}
-                                <ArrowRight className="h-4 w-4" />
+                                <ArrowRight
+                                    className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`}
+                                />
                             </Link>
                         </div>
                     </div>
 
+                    {/* Right: Agenda */}
                     <div className="lg:col-span-2">
-                        <h2 className="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-white">
-                            {t.events}
-                        </h2>
+                        <div className="mb-6 text-center">
+                            <h2 className="text-2xl font-bold text-gray-900 md:text-3xl dark:text-white">
+                                {t.events}
+                            </h2>
+                            <div className="mx-auto mt-2 h-1 w-16 rounded bg-[var(--brand-primary)]" />
+                        </div>
 
                         <div className="space-y-3">
                             {displayEvents.map((event) => {
@@ -236,6 +266,7 @@ export default function BeritaAgendaSection({
                                         to={`/${locale}/agenda/${event.id}`}
                                         className="group flex gap-3 rounded-lg border border-gray-100 bg-white p-3 shadow-sm transition-all hover:border-[var(--brand-primary)]/20 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                                     >
+                                        {/* Date Badge */}
                                         <div
                                             className={`flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-lg text-white ${badge.colorClass}`}
                                         >
@@ -247,6 +278,7 @@ export default function BeritaAgendaSection({
                                             </span>
                                         </div>
 
+                                        {/* Event Info */}
                                         <div className="min-w-0 flex-1">
                                             <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-[var(--brand-primary)] dark:text-gray-100 dark:group-hover:text-[var(--brand-primary)]">
                                                 {getTitle(event, locale)}
@@ -266,13 +298,16 @@ export default function BeritaAgendaSection({
                                                             0,
                                                             5,
                                                         )}
-                                                        {t.timezone ? ` ${t.timezone}` : ''}
+                                                        {t.timezone &&
+                                                            ` ${t.timezone}`}
                                                     </span>
                                                 )}
                                                 {event.location && (
                                                     <span className="flex items-center gap-0.5">
                                                         <MapPin className="h-3 w-3" />
-                                                        {event.location}
+                                                        <span className="truncate">
+                                                            {event.location}
+                                                        </span>
                                                     </span>
                                                 )}
                                             </div>
@@ -282,13 +317,16 @@ export default function BeritaAgendaSection({
                             })}
                         </div>
 
+                        {/* View All */}
                         <div className="mt-5 text-center">
                             <Link
                                 to={`/${locale}/agenda-kegiatan`}
-                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-primary)] dark:text-[var(--brand-primary)] dark:hover:text-[var(--brand-primary)]"
+                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-secondary)]"
                             >
                                 {t.view_all_events}
-                                <ArrowRight className="h-4 w-4" />
+                                <ArrowRight
+                                    className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`}
+                                />
                             </Link>
                         </div>
                     </div>

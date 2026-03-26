@@ -53,25 +53,21 @@ export default function PageDetailPage() {
         enabled: !!slug,
     });
 
-    if (isLoading) return <Loading />;
-    if (error || !page) return <ErrorState onRetry={() => refetch()} />;
-
-    const title = getTitle(page, lang);
-    const content = getContent(page, lang);
-    const isBuilder = page.layout_type === 'builder';
-
-    // Map sections to SectionWithData format
-    const sectionsWithData: SectionWithData[] = (page.sections || [])
-        .filter((s) => s.is_active)
-        .sort((a, b) => a.order - b.order)
-        .map((s) => ({
-            id: s.id,
-            type: s.type,
-            data: s.data,
-            order: s.order,
-            is_active: s.is_active,
-            dynamic_data: s.dynamic_data,
-        }));
+    // Map sections to SectionWithData format (moved BEFORE any early returns)
+    const sectionsWithData: SectionWithData[] = useMemo(() => {
+        if (!page?.sections) return [];
+        return page.sections
+            .filter((s) => s.is_active)
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+                id: s.id,
+                type: s.type,
+                data: s.data,
+                order: s.order,
+                is_active: s.is_active,
+                dynamic_data: s.dynamic_data,
+            }));
+    }, [page?.sections]);
 
     const sectionTypes = useMemo(
         () => sectionsWithData.map((s) => s.type),
@@ -79,6 +75,7 @@ export default function PageDetailPage() {
     );
 
     useEffect(() => {
+        if (sectionTypes.length === 0) return;
         preloadSectionComponents(
             sectionTypes.filter((type) =>
                 ['hero', 'slider', 'quick_links', 'announcements'].includes(
@@ -87,6 +84,14 @@ export default function PageDetailPage() {
             ),
         );
     }, [sectionTypes]);
+
+    // Early returns AFTER all hooks
+    if (isLoading) return <Loading />;
+    if (error || !page) return <ErrorState onRetry={() => refetch()} />;
+
+    const title = getTitle(page, lang);
+    const content = getContent(page, lang);
+    const isBuilder = page.layout_type === 'builder';
 
     return (
         <>

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
     LineChart,
     Line,
@@ -35,6 +36,88 @@ interface StatsSectionProps {
     };
     dynamic_data?: StatItem[];
     locale: string;
+}
+
+// Hook for animated counter with intersection observer
+function useAnimatedCounter(
+    targetValue: number,
+    duration: number = 2000,
+    suffix: string = ''
+): { displayValue: string; ref: React.RefObject<HTMLSpanElement> } {
+    const [displayValue, setDisplayValue] = useState('0' + suffix);
+    const [hasAnimated, setHasAnimated] = useState(false);
+    const ref = useRef<HTMLSpanElement>(null);
+
+    const animate = useCallback(() => {
+        if (hasAnimated) return;
+        setHasAnimated(true);
+
+        const startTime = performance.now();
+        const startValue = 0;
+
+        const tick = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Ease out cubic for smooth deceleration
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.round(
+                startValue + (targetValue - startValue) * easeOut
+            );
+
+            // Format with thousands separator
+            const formatted =
+                currentValue.toLocaleString('id-ID') + suffix;
+            setDisplayValue(formatted);
+
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        };
+
+        requestAnimationFrame(tick);
+    }, [targetValue, duration, suffix, hasAnimated]);
+
+    useEffect(() => {
+        const element = ref.current;
+        if (!element) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        animate();
+                        observer.disconnect();
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [animate]);
+
+    return { displayValue, ref: ref as React.RefObject<HTMLSpanElement> };
+}
+
+// Parse number string like "1.500+" or "25.000" into { value: number, suffix: string }
+function parseStatNumber(numStr?: string): { value: number; suffix: string } {
+    if (!numStr) return { value: 0, suffix: '' };
+
+    // Remove dots used as thousands separators (Indonesian format)
+    const cleaned = numStr.replace(/\./g, '');
+
+    // Extract numeric part and suffix (like +, %, etc.)
+    const match = cleaned.match(/^(\d+)(.*)$/);
+    if (match) {
+        return {
+            value: parseInt(match[1], 10),
+            suffix: match[2] || '',
+        };
+    }
+
+    return { value: 0, suffix: '' };
 }
 
 // Colors matched with standard Unisnu branding/colors
@@ -91,6 +174,62 @@ function parseChartData(dataStr?: string) {
         });
 }
 
+// Animated stat card component
+function AnimatedStatCard({
+    item,
+    iconPath,
+    label,
+}: {
+    item: StatItem;
+    iconPath?: string;
+    label: string;
+}) {
+    const parsed = parseStatNumber(item.number);
+    const { displayValue, ref } = useAnimatedCounter(
+        parsed.value,
+        2000,
+        parsed.suffix
+    );
+
+    return (
+        <div className="flex flex-col items-center justify-center rounded-xl bg-white p-6 shadow-sm transition-transform hover:scale-105 dark:bg-gray-900 dark:shadow-gray-900/30">
+            {iconPath && (
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] dark:bg-[var(--brand-primary)]/20">
+                    <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d={iconPath}
+                        />
+                    </svg>
+                </div>
+            )}
+            <span
+                ref={ref}
+                className="text-3xl font-bold text-[var(--brand-primary)] tabular-nums"
+            >
+                {displayValue}
+            </span>
+            <span className="mt-1 text-center text-sm text-gray-600 dark:text-gray-400">
+                {label}
+            </span>
+        </div>
+    );
+}
+
+// i18n labels for empty state
+const EMPTY_STATE_LABELS: Record<string, string> = {
+    id: 'Tidak ada data statistik yang tersedia.',
+    en: 'No statistics data available.',
+    ar: 'لا تتوفر بيانات إحصائية.',
+};
+
 export function StatsSection({
     data,
     dynamic_data,
@@ -108,8 +247,28 @@ export function StatsSection({
             : data.items || [];
 
     const statsT = STATS_LABELS[locale] || STATS_LABELS.id;
+    const emptyStateText = EMPTY_STATE_LABELS[locale] || EMPTY_STATE_LABELS.id;
 
-    if (items.length === 0) return null;
+    // Show empty state with message instead of returning null
+    if (items.length === 0) {
+        return (
+            <section
+                className="bg-gray-50 py-12 md:py-16 dark:bg-gray-800"
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+            >
+                <div className="mx-auto max-w-6xl px-4 text-center">
+                    {title && (
+                        <h2 className="mb-6 text-2xl font-bold text-gray-900 md:text-3xl dark:text-white">
+                            {title}
+                        </h2>
+                    )}
+                    <p className="text-gray-500 dark:text-gray-400">
+                        {emptyStateText}
+                    </p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section
@@ -145,37 +304,15 @@ export function StatsSection({
                         const itemType = item.type || 'number';
                         const label = getLabel(item, locale);
 
-                        // Check if it's a number type
+                        // Check if it's a number type - use AnimatedStatCard
                         if (itemType === 'number') {
                             return (
-                                <div
+                                <AnimatedStatCard
                                     key={idx}
-                                    className="flex flex-col items-center justify-center rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900 dark:shadow-gray-900/30"
-                                >
-                                    {iconPath && (
-                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] dark:bg-[var(--brand-primary)]/20 dark:text-[var(--brand-primary)]">
-                                            <svg
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth={1.5}
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d={iconPath}
-                                                />
-                                            </svg>
-                                        </div>
-                                    )}
-                                    <span className="text-3xl font-bold text-[var(--brand-primary)] dark:text-[var(--brand-primary)]">
-                                        {item.number}
-                                    </span>
-                                    <span className="mt-1 text-center text-sm text-gray-600 dark:text-gray-400">
-                                        {label}
-                                    </span>
-                                </div>
+                                    item={item}
+                                    iconPath={iconPath}
+                                    label={label}
+                                />
                             );
                         }
 
