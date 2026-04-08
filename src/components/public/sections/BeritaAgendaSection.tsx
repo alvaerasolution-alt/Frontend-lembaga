@@ -148,15 +148,15 @@ export default function BeritaAgendaSection({
     events,
     locale,
 }: BeritaAgendaSectionProps) {
-    const displayNews = news.slice(0, 6);
-    const displayEvents = events.slice(0, 7);
+    const displayNews = news.slice(0, 4);
+    const displayEvents = events.slice(0, 5);
     const t = LABELS[locale] || LABELS.id;
     const isRtl = locale === 'ar';
 
     return (
-        <section className="py-12 md:py-16" dir={isRtl ? 'rtl' : 'ltr'}>
-            <div className="mx-auto max-w-7xl px-4">
-                <div className="grid gap-10 lg:grid-cols-5">
+        <section className="bg-gray-50/50 py-12 md:py-16 dark:bg-gray-900/40" dir={isRtl ? 'rtl' : 'ltr'}>
+            <div className="mx-auto max-w-[90rem] px-4">
+                <div className="grid gap-10 lg:grid-cols-4">
                     {/* Left: Berita */}
                     <div className="lg:col-span-3">
                         <div className="mb-6 text-center">
@@ -166,12 +166,12 @@ export default function BeritaAgendaSection({
                             <div className="mx-auto mt-2 h-1 w-16 rounded bg-[var(--brand-primary)]" />
                         </div>
 
-                        <div className="grid gap-5 sm:grid-cols-2">
+                        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
                             {displayNews.map((item) => (
                                 <Link
                                     key={item.id}
                                     to={`/${locale}/${item.slug}`}
-                                    className="group overflow-hidden rounded-xl bg-white shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-900/30"
+                                    className="group overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-[var(--brand-primary)]/20 dark:bg-gray-800 dark:shadow-gray-900/30 dark:ring-gray-700"
                                 >
                                     {/* Thumbnail */}
                                     <div className="relative aspect-[16/10] overflow-hidden">
@@ -195,7 +195,7 @@ export default function BeritaAgendaSection({
                                         )}
                                         {/* Date overlay */}
                                         <span
-                                            className={`absolute bottom-2 rounded bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm ${isRtl ? 'right-2' : 'left-2'}`}
+                                            className={`absolute top-2 rounded bg-[var(--brand-primary)] px-2.5 py-1 text-xs font-medium text-white shadow-sm ${isRtl ? 'right-2' : 'left-2'}`}
                                         >
                                             {formatDate(
                                                 item.published_at,
@@ -206,7 +206,7 @@ export default function BeritaAgendaSection({
                                         {/* Views overlay */}
                                         {item.views > 0 && (
                                             <span
-                                                className={`absolute bottom-2 flex items-center gap-1 rounded bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm ${isRtl ? 'left-2' : 'right-2'}`}
+                                                className={`absolute bottom-2 flex items-center gap-1 rounded bg-black/60 px-2 py-1 text-[10px] text-white backdrop-blur-sm ${isRtl ? 'left-2' : 'right-2'}`}
                                             >
                                                 <Eye className="h-3 w-3" />
                                                 {item.views}
@@ -231,21 +231,21 @@ export default function BeritaAgendaSection({
                         </div>
 
                         {/* View All */}
-                        <div className="mt-5 text-center">
+                        <div className="mt-8 text-center">
                             <Link
                                 to={`/${locale}/berita`}
-                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-secondary)]"
+                                className="group/btn inline-flex items-center gap-2 rounded-full border-2 border-[var(--brand-primary)] px-5 py-2 text-sm font-semibold text-[var(--brand-primary)] transition-all duration-300 hover:bg-[var(--brand-primary)] hover:text-white"
                             >
                                 {t.view_all_news}
                                 <ArrowRight
-                                    className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`}
+                                    className={`h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1 ${isRtl ? 'rotate-180 group-hover/btn:-translate-x-1' : ''}`}
                                 />
                             </Link>
                         </div>
                     </div>
 
                     {/* Right: Agenda */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-1">
                         <div className="mb-6 text-center">
                             <h2 className="text-2xl font-bold text-gray-900 md:text-3xl dark:text-white">
                                 {t.events}
@@ -264,7 +264,7 @@ export default function BeritaAgendaSection({
                                     <Link
                                         key={event.id}
                                         to={`/${locale}/agenda/${event.id}`}
-                                        className="group flex gap-3 rounded-lg border border-gray-100 bg-white p-3 shadow-sm transition-all hover:border-[var(--brand-primary)]/20 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                                        className="group flex gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--brand-primary)]/30 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
                                     >
                                         {/* Date Badge */}
                                         <div
@@ -318,14 +318,14 @@ export default function BeritaAgendaSection({
                         </div>
 
                         {/* View All */}
-                        <div className="mt-5 text-center">
+                        <div className="mt-8 text-center">
                             <Link
                                 to={`/${locale}/agenda-kegiatan`}
-                                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-secondary)]"
+                                className="group/btn inline-flex items-center gap-2 rounded-full border-2 border-[var(--brand-primary)] px-5 py-2 text-sm font-semibold text-[var(--brand-primary)] transition-all duration-300 hover:bg-[var(--brand-primary)] hover:text-white"
                             >
                                 {t.view_all_events}
                                 <ArrowRight
-                                    className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`}
+                                    className={`h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1 ${isRtl ? 'rotate-180 group-hover/btn:-translate-x-1' : ''}`}
                                 />
                             </Link>
                         </div>

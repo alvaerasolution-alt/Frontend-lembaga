@@ -120,7 +120,7 @@ function parseStatNumber(numStr?: string): { value: number; suffix: string } {
     return { value: 0, suffix: '' };
 }
 
-// Colors matched with standard Unisnu branding/colors
+// Colors matched with standard UAIKU branding/colors
 const COLORS = [
     '#10b981',
     '#3b82f6',
