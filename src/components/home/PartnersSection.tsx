@@ -1,13 +1,18 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import type { Partner } from '@/types';
 
 interface PartnersSectionProps {
     partners: Partner[];
+    scrollSpeed?: number; // in seconds, default 30
 }
 
-export default function PartnersSection({ partners }: PartnersSectionProps) {
-    const { lang } = useLanguage();
+export default function PartnersSection({
+    partners,
+    scrollSpeed = 30,
+}: PartnersSectionProps) {
+    const { lang, withLocale } = useLanguage();
 
     if (partners.length === 0) return null;
 
@@ -61,12 +66,17 @@ export default function PartnersSection({ partners }: PartnersSectionProps) {
                     </p>
                 </div>
 
-                {/* Partner Groups */}
+                {/* Partner Groups — infinite scroll per category */}
                 {Object.entries(grouped).map(([category, items]) => {
                     const label = categoryLabels[category] || {
                         id: category,
                         en: category,
                     };
+                    // Duplicate items for seamless loop
+                    const scrollItems = [...items, ...items];
+                    // Scale speed based on number of items
+                    const speed = Math.max(scrollSpeed, items.length * 4);
+
                     return (
                         <div key={category} className="mb-8 last:mb-0">
                             <h3 className="mb-4 text-center text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
@@ -76,13 +86,43 @@ export default function PartnersSection({ partners }: PartnersSectionProps) {
                                       ? label.en
                                       : label.id}
                             </h3>
-                            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-                                {items.map((partner) => (
-                                    <PartnerLogo
-                                        key={partner.id}
-                                        partner={partner}
-                                    />
-                                ))}
+                            <div
+                                className="pause-on-hover group relative flex overflow-hidden"
+                                style={
+                                    {
+                                        '--scroll-speed': `${speed}s`,
+                                    } as React.CSSProperties
+                                }
+                            >
+                                <div className="animate-infinite-scroll-x flex shrink-0 gap-8 py-4 md:gap-12">
+                                    {scrollItems.map((partner, index) => {
+                                        const partnerLogo =
+                                            partner.logo_url || partner.logo;
+                                        return (
+                                            <Link
+                                                key={`${partner.id}-${index}`}
+                                                to={withLocale(
+                                                    `/mitra/${partner.id}`,
+                                                )}
+                                                className="flex shrink-0 items-center justify-center p-2 transition-transform hover:scale-110"
+                                                title={partner.name}
+                                            >
+                                                {partnerLogo ? (
+                                                    <img
+                                                        src={partnerLogo}
+                                                        alt={partner.name}
+                                                        loading="lazy"
+                                                        className="h-12 w-auto max-w-[140px] object-contain grayscale transition-all duration-300 hover:grayscale-0 md:h-16 md:max-w-[160px]"
+                                                    />
+                                                ) : (
+                                                    <span className="whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
+                                                        {partner.name}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
                     );
@@ -91,7 +131,7 @@ export default function PartnersSection({ partners }: PartnersSectionProps) {
                 {/* View All Partners Button */}
                 <div className="mt-12 flex justify-center">
                     <Link
-                        to={`/${lang}/mitra`}
+                        to={withLocale('/mitra')}
                         className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm outline-none ring-[var(--brand-primary)] drop-shadow-sm transition-all hover:bg-gray-50 hover:text-[var(--brand-primary)] focus-visible:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                     >
                         {lang === 'ar'
@@ -103,33 +143,5 @@ export default function PartnersSection({ partners }: PartnersSectionProps) {
                 </div>
             </div>
         </section>
-    );
-}
-
-function PartnerLogo({ partner }: { partner: Partner }) {
-    const { withLocale } = useLanguage();
-    const partnerLogo = partner.logo_url || partner.logo;
-
-    const content = partnerLogo ? (
-        <img
-            src={partnerLogo}
-            alt={partner.name}
-            loading="lazy"
-            className="h-12 w-auto max-w-[140px] object-contain grayscale transition-all hover:grayscale-0 md:h-16 md:max-w-[160px]"
-        />
-    ) : (
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {partner.name}
-        </span>
-    );
-
-    return (
-        <Link
-            to={withLocale(`/mitra/${partner.id}`)}
-            className="flex items-center justify-center p-2 transition-transform hover:scale-105"
-            title={partner.name}
-        >
-            {content}
-        </Link>
     );
 }

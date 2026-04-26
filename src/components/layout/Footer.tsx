@@ -300,7 +300,7 @@ export default function Footer() {
             {/* Back to Top Button */}
             <button
                 onClick={scrollToTop}
-                className={`bg-brand-primary fixed right-6 bottom-6 z-50 rounded-full p-3 text-white shadow-lg transition-all duration-300 hover:opacity-90 ${
+                className={`bg-brand-primary fixed z-50 rounded-full p-3 text-white shadow-lg transition-all duration-300 hover:opacity-90 right-6 bottom-[5.5rem] lg:bottom-6 ${
                     showBackToTop
                         ? 'translate-y-0 opacity-100'
                         : 'pointer-events-none translate-y-4 opacity-0'

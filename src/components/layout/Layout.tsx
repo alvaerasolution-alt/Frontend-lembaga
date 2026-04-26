@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 import { Outlet } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
+import MobileBottomBar from './MobileBottomBar';
 import PopupBanner from './PopupBanner';
 import { fetchMenus } from '@/api/menus';
 import { fetchSettings } from '@/api/settings';
@@ -166,7 +167,7 @@ export default function Layout() {
                     </div>
                 )}
 
-                <main id="main-content" className="flex-1">
+                <main id="main-content" className="flex-1 pb-16 lg:pb-0">
                     <Outlet />
                 </main>
 
@@ -179,7 +180,7 @@ export default function Layout() {
                     href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`fixed bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 ${isRtl ? 'left-6' : 'right-6'}`}
+                    className={`fixed z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 ${isRtl ? 'left-6' : 'right-6'} bottom-[5.5rem] lg:bottom-20`}
                     aria-label="WhatsApp"
                 >
                     <svg
@@ -191,6 +192,9 @@ export default function Layout() {
                     </svg>
                 </a>
             )}
+
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomBar />
         </>
     );
 }

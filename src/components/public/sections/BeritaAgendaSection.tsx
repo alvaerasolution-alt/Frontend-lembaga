@@ -148,7 +148,7 @@ export default function BeritaAgendaSection({
     events,
     locale,
 }: BeritaAgendaSectionProps) {
-    const displayNews = news.slice(0, 4);
+    const displayNews = news.slice(0, 12);
     const displayEvents = events.slice(0, 5);
     const t = LABELS[locale] || LABELS.id;
     const isRtl = locale === 'ar';

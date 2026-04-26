@@ -191,3 +191,13 @@
 .pause-on-hover:focus-within .animate-infinite-scroll-x {
     animation-play-state: paused;
 }
+
+/* Mobile Bottom Bar slide-up entrance */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
