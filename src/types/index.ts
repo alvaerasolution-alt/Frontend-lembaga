@@ -299,29 +299,44 @@ export interface DosenProfile {
     id: number;
     name: string;
     full_name: string;
-    nidn: string;
-    title_prefix: string;
-    title_suffix: string;
-    email: string;
-    phone: string;
-    photo: string;
-    photo_url?: string;
-    bio_id: string;
-    bio_en: string;
-    bio_ar: string;
-    expertise_id: string;
-    expertise_en: string;
-    expertise_ar: string;
+    nidn: string | null;
+    title_prefix: string | null;
+    title_suffix: string | null;
+    email: string | null;
+    phone: string | null;
+    photo: string | null;
+    photo_url?: string | null;
+    bio_id: string | null;
+    bio_en: string | null;
+    bio_ar: string | null;
+    expertise_id: string | null;
+    expertise_en: string | null;
+    expertise_ar: string | null;
     publications: unknown;
-    scholar_url: string;
+    scholar_url: string | null;
+    sinta_id: string | null;
+    orcid_id: string | null;
+    scopus_id: string | null;
     is_active: boolean;
+    // Additional profile fields
+    nuptk: string | null;
+    niy: string | null;
+    homebase: string | null;
+    jabatan_fungsional: string | null;
+    mata_kuliah: string[] | null;
+    bahan_ajar: { judul: string; nama_jenis: string; nama_penerbit: string; tanggal_terbit: string }[] | null;
+    penelitian: { judul: string; tahun_pelaksanaan: string }[] | null;
+    pengabdian: { judul: string; tahun_pelaksanaan: string }[] | null;
+    publikasi: { judul: string; tautan: string; tanggal: string }[] | null;
+    hki: { judul: string; tahun: string }[] | null;
+    referensi: { sertifikat: string; tautan: string; tanggal: string }[] | null;
     jabatan?: {
         id: number;
         nama_jabatan: string;
         urutan: number;
         is_active: boolean;
     } | null;
-    study_program?: StudyProgram;
+    study_program?: StudyProgram | null;
 }
 
 // ── Achievement ─────────────────────────────────────────────────────
