@@ -387,7 +387,7 @@ export default function Header() {
 
     return (
         <header
-            className={`sticky top-0 z-50 w-full transition-shadow duration-300 ${
+            className={`sticky top-0 z-50 w-full bg-white transition-shadow duration-300 dark:bg-gray-900 ${
                 scrolled
                     ? 'shadow-lg shadow-black/5 dark:shadow-black/20'
                     : 'shadow-sm'
