@@ -65,9 +65,9 @@ export default function DosenSection({ dosenProfiles }: DosenSectionProps) {
                         >
                             {/* Photo */}
                             <div className="bg-brand/10 dark:bg-brand/90/20 relative aspect-square overflow-hidden">
-                                {dosen.photo ? (
+                                {(dosen.photo_url || dosen.photo) ? (
                                     <img
-                                        src={dosen.photo}
+                                        src={(dosen.photo_url ?? dosen.photo) || undefined}
                                         alt={dosen.full_name}
                                         loading="lazy"
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"

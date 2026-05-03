@@ -75,9 +75,9 @@ export default function CareerSection({ careerPosts }: CareerSectionProps) {
                     {featured && (
                         <div className="group overflow-hidden rounded-xl bg-white shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
                             <div className="relative aspect-video overflow-hidden">
-                                {featured.image ? (
+                                {(featured.image_url || featured.image) ? (
                                     <img
-                                        src={featured.image}
+                                        src={featured.image_url || featured.image || undefined}
                                         alt={getTitle(featured, lang)}
                                         loading="lazy"
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -144,9 +144,9 @@ export default function CareerSection({ careerPosts }: CareerSectionProps) {
                                 className="group flex gap-4 overflow-hidden rounded-xl bg-white p-3 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800"
                             >
                                 <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-lg md:h-28 md:w-36">
-                                    {item.image ? (
+                                    {(item.image_url || item.image) ? (
                                         <img
-                                            src={item.image}
+                                            src={item.image_url || item.image || undefined}
                                             alt={getTitle(item, lang)}
                                             loading="lazy"
                                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"

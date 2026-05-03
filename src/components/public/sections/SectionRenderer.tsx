@@ -375,6 +375,7 @@ function SingleSection({
                     scrollSpeed={
                         Number.isFinite(scrollSpeed) ? scrollSpeed : 40
                     }
+                    locale={locale}
                 />
             ) : null;
         }

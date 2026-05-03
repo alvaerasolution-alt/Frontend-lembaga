@@ -9,11 +9,24 @@ import {
     Youtube,
     MessageCircle,
 } from 'lucide-react';
+
 import { fetchMenus } from '@/api/menus';
 import { fetchSettings } from '@/api/settings';
 import { useInstitution } from '@/context/InstitutionContext';
 import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItem, SiteSettings } from '@/types';
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+        role="img"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91.04c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93v8.18c-.11 3.27-2.73 5.9-6.02 5.97c-3.11.06-5.84-2.27-6.22-5.35c-.38-3.08 1.4-6.07 4.1-7.07c1.37-.53 2.87-.58 4.29-.18v4.25c-.71-.24-1.5-.13-2.12.35c-.62.49-.96 1.25-.9 2.03c.06.84.78 1.5 1.63 1.53c.96.03 1.78-.65 1.89-1.6c.03-.26.05-.53.05-.79V.02V.02z" />
+    </svg>
+);
 
 export default function Footer() {
     const { institution } = useInstitution();
@@ -136,6 +149,11 @@ export default function Footer() {
             label: 'YouTube',
         },
         {
+            icon: TikTokIcon,
+            href: siteSettings.tiktok_url || '#',
+            label: 'TikTok',
+        },
+        {
             icon: Twitter,
             href: siteSettings.twitter_url || '#',
             label: 'Twitter',
@@ -151,8 +169,9 @@ export default function Footer() {
         },
     ].filter((s) => s.href && s.href !== '#');
 
-    // Logo: prioritas logo_url dari Site Settings, fallback ke institution.logo_url
+    // Logo footer: prioritas logo_footer_url, fallback ke logo_url / institution.logo_url
     const logoUrl =
+        siteSettings.logo_footer_url ||
         siteSettings.logo_url ||
         siteSettings.logo ||
         institution?.logo_url ||
@@ -198,7 +217,7 @@ export default function Footer() {
                                     src={logoUrl}
                                     alt={institution?.name || ''}
                                     loading="lazy"
-                                    className="h-12 w-auto brightness-0 invert"
+                                    className="h-12 w-auto"
                                     onError={(e) => {
                                         e.currentTarget.style.display = 'none';
                                         const fallback =
@@ -279,8 +298,7 @@ export default function Footer() {
                                 rel="noopener noreferrer"
                                 className="inline-block rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700"
                             >
-                                Join PMB{' '}
-                                {institution?.name?.split(' ').pop() || ''}
+                                JOIN PMB IAIKU
                             </a>
                         )}
                     </div>

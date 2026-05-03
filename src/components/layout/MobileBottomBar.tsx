@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Newspaper, Phone, GraduationCap, Trophy } from 'lucide-react';
+import { Home, Newspaper, Phone, GraduationCap, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSettings } from '@/api/settings';
@@ -68,15 +68,6 @@ export default function MobileBottomBar() {
     // Build nav items
     const navItems: NavItem[] = [
         {
-            id: 'home',
-            labelId: 'Beranda',
-            labelEn: 'Home',
-            labelAr: 'الرئيسية',
-            icon: Home,
-            to: '/',
-            matchPaths: [''],
-        },
-        {
             id: 'news',
             labelId: 'Berita',
             labelEn: 'News',
@@ -84,15 +75,6 @@ export default function MobileBottomBar() {
             icon: Newspaper,
             to: '/berita',
             matchPaths: ['berita', 'kategori'],
-        },
-        {
-            id: 'contact',
-            labelId: 'Hubungi',
-            labelEn: 'Contact',
-            labelAr: 'اتصل',
-            icon: Phone,
-            to: '/hubungi-kami',
-            matchPaths: ['hubungi-kami', 'kontak'],
         },
         ...(siteSettings.pmb_url
             ? [
@@ -108,14 +90,36 @@ export default function MobileBottomBar() {
               ]
             : []),
         {
-            id: 'achievements',
-            labelId: 'Prestasi',
-            labelEn: 'Achieve',
-            labelAr: 'إنجاز',
-            icon: Trophy,
-            to: '/prestasi-mahasiswa',
-            matchPaths: ['prestasi-mahasiswa', 'prestasi'],
+            id: 'home',
+            labelId: 'Beranda',
+            labelEn: 'Home',
+            labelAr: 'الرئيسية',
+            icon: Home,
+            to: '/',
+            matchPaths: [''],
         },
+        {
+            id: 'contact',
+            labelId: 'Hubungi',
+            labelEn: 'Contact',
+            labelAr: 'اتصل',
+            icon: Phone,
+            to: '/hubungi-kami',
+            matchPaths: ['hubungi-kami', 'kontak'],
+        },
+        ...(siteSettings.portal_url
+            ? [
+                  {
+                      id: 'portal',
+                      labelId: 'Portal',
+                      labelEn: 'Portal',
+                      labelAr: 'البوابة',
+                      icon: LayoutGrid,
+                      href: siteSettings.portal_url,
+                      matchPaths: [] as string[],
+                  },
+              ]
+            : []),
     ];
 
     // Determine active item from current path

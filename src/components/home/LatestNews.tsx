@@ -94,7 +94,7 @@ export default function LatestNews({ news }: NewsSectionProps) {
 
     return (
         <section
-            className="bg-gray-50 py-12 md:py-16 dark:bg-gray-900"
+            className="bg-gray-50 py-12 md:py-16 dark:bg-gray-800"
             dir={isRtl ? 'rtl' : 'ltr'}
         >
             <div className="mx-auto max-w-7xl px-4">

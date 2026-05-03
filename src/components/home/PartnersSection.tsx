@@ -45,7 +45,7 @@ export default function PartnersSection({
     };
 
     return (
-        <section className="bg-gray-50 py-12 md:py-16 dark:bg-gray-900">
+        <section className="bg-gray-50 py-12 md:py-16 dark:bg-gray-800">
             <div className="mx-auto max-w-7xl px-4">
                 {/* Section Header */}
                 <div className="mb-10 text-center">

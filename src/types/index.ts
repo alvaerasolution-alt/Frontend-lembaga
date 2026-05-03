@@ -52,6 +52,8 @@ export interface Slider {
     image_url?: string;
     link: string | null;
     badge: string | null;
+    text_position?: string;
+    text_color?: string;
     order: number;
     is_active: boolean;
 }
@@ -223,6 +225,7 @@ export interface Career {
     requirements_en: string;
     requirements_ar: string;
     image: string;
+    image_url?: string | null;
     deadline: string;
     registration_url: string;
     status: string;
@@ -430,8 +433,12 @@ export interface SiteSettings {
     site_tagline?: string;
     site_description?: string;
     logo?: string;
+    logo_url?: string;
     logo_dark?: string;
+    logo_footer?: string;
+    logo_footer_url?: string;
     favicon?: string;
+    favicon_url?: string;
     address?: string;
     phone?: string;
     email?: string;
